@@ -8,6 +8,8 @@ using Dio_Dotnet_API_Desafio.Entities;
 
 namespace Dio_Dotnet_API_Desafio.Controllers
 {
+    [ApiController]
+    [Route("[controller]")]
     public class TarefaController : ControllerBase
     {
         private readonly OrganizadorContext _context;   
@@ -49,12 +51,11 @@ namespace Dio_Dotnet_API_Desafio.Controllers
 
         [HttpPost]    
         public IActionResult Criar(Tarefa tarefa) {
-            var tarefaBanco = _context.Add(tarefa);
-
             if (tarefa.Data == DateTime.MinValue) {
                 return BadRequest("A data da tarefa não pode ser vazia");
             }
 
+            _context.Add(tarefa);
             _context.SaveChanges();
             return CreatedAtAction(nameof(ObterPorId), new {id = tarefa.Id}, tarefa);
         }
@@ -67,13 +68,13 @@ namespace Dio_Dotnet_API_Desafio.Controllers
                 return NotFound();
             }
 
-            if (tarefaBanco.Data == DateTime.MinValue) {
+            if (tarefa.Data == DateTime.MinValue) {
                 return BadRequest("A data não pode ser vazia");
             }
 
             tarefaBanco.Titulo = tarefa.Titulo;
             tarefaBanco.Descricao = tarefa.Descricao;
-            tarefaBanco.Data = DateTime.MinValue;
+            tarefaBanco.Data = tarefa.Data;
             tarefaBanco.Status = tarefa.Status;
             
             _context.Tarefas.Update(tarefaBanco);
